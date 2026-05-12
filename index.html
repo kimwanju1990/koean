@@ -2,545 +2,260 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>훈민정음: 위대한 소리의 유산</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>훈민정음 탐험대</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&family=Nanum+Myeongjo:wght@400;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&family=Nanum+Gothic:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-gold: #d4af37;
-            --bg-dark: #0a0c10;
-            --card-bg: #161b22;
+            --korean-red: #8B0000;
+            --korean-gold: #D4AF37;
+            --paper-bg: #F4F1EA;
         }
-        body { 
-            font-family: 'Noto Sans KR', sans-serif; 
-            background-color: var(--bg-dark); 
-            color: #f1f5f9;
-            overflow: hidden; 
-            margin: 0;
+        body {
+            font-family: 'Nanum Gothic', sans-serif;
+            background-color: var(--paper-bg);
+            touch-action: manipulation;
+            overflow: hidden;
         }
-        .serif { font-family: 'Nanum Myeongjo', serif; }
-        .gold-text { color: var(--primary-gold); }
-        .gold-border { border-color: var(--primary-gold); }
+        .myeongjo { font-family: 'Nanum Myeongjo', serif; }
+        .hanok-border {
+            border: 8px double var(--korean-red);
+            border-radius: 15px;
+        }
+        .btn-korea {
+            background-color: var(--korean-red);
+            color: white;
+            transition: all 0.3s;
+            box-shadow: 0 4px 0px #5a0000;
+        }
+        .btn-korea:active {
+            transform: translateY(4px);
+            box-shadow: 0 0px 0px #5a0000;
+        }
+        .card {
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .card:active { transform: scale(0.95); }
+        .correct { background-color: #d1fae5 !important; border-color: #10b981 !important; }
+        .wrong { background-color: #fee2e2 !important; border-color: #ef4444 !important; }
         
-        .btn-gold { 
-            background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%);
-            color: #1a1a1a;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        .btn-gold:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4); }
-        .btn-gold:active { transform: translateY(0); }
-
-        .game-card {
-            background: var(--card-bg);
-            border: 1px solid #30363d;
-            border-radius: 1.5rem;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-
-        @keyframes stroke-appear {
-            from { opacity: 0; transform: scale(0.5) rotate(-10deg); filter: blur(5px); }
-            to { opacity: 1; transform: scale(1) rotate(0); filter: blur(0); }
-        }
-        .stroke-animation { animation: stroke-appear 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        
-        .vibrate { animation: vibrate 0.2s linear infinite; }
-        @keyframes vibrate {
-            0% { transform: translateX(0); }
-            25% { transform: translateX(2px); }
-            50% { transform: translateX(0); }
-            75% { transform: translateX(-2px); }
-            100% { transform: translateX(0); }
-        }
-
-        .falling-letter {
-            position: absolute;
-            user-select: none;
-            transition: background-color 0.2s;
-        }
+        .animate-in { animation: fadeIn 0.5s ease-out forwards; }
     </style>
 </head>
-<body class="flex flex-col h-screen overflow-hidden">
+<body class="flex items-center justify-center min-h-screen p-4">
 
-    <header class="bg-black/40 backdrop-blur-md border-b border-white/10 p-4 flex justify-between items-center z-50">
-        <div class="flex items-center gap-4">
-            <div class="w-12 h-12 rounded-xl border gold-border flex items-center justify-center text-2xl bg-black/50">訓</div>
-            <div>
-                <h1 class="text-xl font-bold serif gold-text tracking-widest">훈민정음: 소리의 비밀</h1>
-                <p class="text-[10px] text-slate-500 uppercase tracking-widest">Scientific Principles of Hangeul</p>
-            </div>
-        </div>
-        <div class="flex gap-8 items-center bg-black/30 px-6 py-2 rounded-2xl border border-white/5">
-            <div class="text-center">
-                <p class="text-[10px] text-slate-500 mb-0.5">SCORE</p>
-                <div id="scoreDisplay" class="text-2xl font-bold gold-text tabular-nums">0000</div>
-            </div>
-            <div id="timerContainer" class="text-center hidden border-l border-white/10 pl-8">
-                <p class="text-[10px] text-slate-500 mb-0.5">TIME</p>
-                <div id="gameTimer" class="text-2xl font-bold text-red-500 tabular-nums">45</div>
-            </div>
-        </div>
-    </header>
-
-    <main id="gameContainer" class="flex-grow flex flex-col items-center justify-center p-6 relative">
+    <div id="game-container" class="w-full max-w-4xl h-[90vh] bg-white hanok-border shadow-2xl relative flex flex-col overflow-hidden">
         
-        <!-- 시작 화면 -->
-        <div id="startScreen" class="text-center max-w-2xl game-card p-12 animate-in fade-in zoom-in duration-700">
-            <div class="inline-block p-2 bg-amber-900/20 rounded-full mb-6">
-                <span class="text-xs gold-text font-bold px-4 tracking-widest">교육용 마스터피스</span>
-            </div>
-            <h2 class="text-5xl font-extrabold mb-8 serif gold-text leading-tight">지혜로운 자는 아침이<br>가기 전에 깨우친다</h2>
-            <p class="text-slate-400 mb-12 leading-relaxed text-lg px-6">
-                세종대왕님의 깊은 뜻이 담긴 글자, 한글.<br>
-                단순히 외우는 것이 아닌 <span class="text-white font-bold underline decoration-gold">과학적 원리</span>를 직접 조립하며 배워보세요.
-            </p>
-            <div class="grid grid-cols-3 gap-6 mb-12 text-sm">
-                <div class="p-4 rounded-2xl bg-black/30 border border-white/5">
-                    <div class="text-2xl mb-2">🦷</div>
-                    <p class="text-slate-300">상형의 원리</p>
-                </div>
-                <div class="p-4 rounded-2xl bg-black/30 border border-white/5">
-                    <div class="text-2xl mb-2">➕</div>
-                    <p class="text-slate-300">가획의 원리</p>
-                </div>
-                <div class="p-4 rounded-2xl bg-black/30 border border-white/5">
-                    <div class="text-2xl mb-2">☀️</div>
-                    <p class="text-slate-300">합성의 원리</p>
-                </div>
-            </div>
-            <button onclick="startStage(1)" class="btn-gold font-bold py-5 px-16 rounded-full text-xl">
-                도전 시작하기
-            </button>
-        </div>
+        <!-- Header -->
+        <header class="p-4 border-b-2 border-red-800 flex justify-between items-center bg-[#fdfaf5]">
+            <h1 class="text-xl md:text-2xl font-bold myeongjo text-red-900">훈민정음 탐험대</h1>
+            <div id="progress" class="text-sm font-bold text-gray-600">진행도: 1 / 3</div>
+        </header>
 
-        <!-- Stage 1: 가획의 원리 -->
-        <div id="stage1" class="hidden w-full max-w-5xl">
-            <div class="text-center mb-12">
-                <h3 class="text-4xl font-black serif mb-3 gold-text">Stage 1: 가획(加劃)의 비밀</h3>
-                <p class="text-slate-400 text-lg">기본자에 획을 더해 '소리의 세기'를 조절해 보세요.</p>
-            </div>
-            
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
-                <div id="baseConsonants" class="space-y-3">
-                    <p class="text-center text-xs text-slate-500 uppercase tracking-widest mb-4">발음 기관을 본뜬 기본자</p>
-                    <!-- 기본 자음 영역 -->
-                </div>
-                
-                <div class="flex flex-col items-center justify-center p-8 bg-black/40 rounded-3xl border border-white/5">
-                    <div id="strokeTool" class="w-40 h-40 rounded-full border-4 gold-border flex flex-col items-center justify-center cursor-pointer bg-slate-900 hover:scale-105 transition-all group shadow-[0_0_30px_rgba(212,175,55,0.1)]">
-                        <span class="text-5xl group-hover:rotate-90 transition-transform duration-500">➕</span>
-                        <span class="text-xs mt-3 gold-text font-bold tracking-tighter">획(劃) 추가</span>
-                    </div>
-                    <p class="text-slate-400 text-sm mt-8 text-center leading-relaxed">
-                        왼쪽에서 <span class="text-white font-bold">기본자</span>를 선택하고<br>
-                        도구를 눌러 <span class="gold-text">가획자</span>를 완성하세요.
+        <!-- Main Content Area -->
+        <main id="content" class="flex-1 p-6 flex flex-col items-center justify-center text-center">
+            <!-- Start Screen -->
+            <div id="screen-start" class="animate-in">
+                <div class="mb-6">
+                    <img src="https://placehold.co/200x200/8B0000/FFFFFF?text=훈민정음" alt="Sejong" class="mx-auto rounded-full border-4 border-gold-500 shadow-lg mb-4">
+                    <h2 class="text-3xl font-extrabold myeongjo mb-4 text-gray-800">세종대왕의 비밀 코드</h2>
+                    <p class="text-lg text-gray-600 mb-8 leading-relaxed">
+                        안녕, 6학년 친구들!<br>
+                        세상에서 가장 과학적인 글자, 훈민정음의 비밀을<br>
+                        함께 풀어보지 않겠니?
                     </p>
                 </div>
-
-                <div class="grid grid-cols-2 gap-4" id="targetConsonants">
-                    <!-- 목표 가획자 영역 -->
-                </div>
-            </div>
-        </div>
-
-        <!-- Stage 2: 삼재의 조화 -->
-        <div id="stage2" class="hidden w-full max-w-5xl">
-            <div class="text-center mb-12">
-                <h3 class="text-4xl font-black serif mb-3 gold-text">Stage 2: 천지인(天地人) 연금술</h3>
-                <p class="text-slate-400 text-lg">하늘, 땅, 사람의 모양을 합쳐 우주의 소리를 만듭니다.</p>
+                <button onclick="startGame()" class="btn-korea px-12 py-4 rounded-full text-xl font-bold">탐험 시작하기</button>
             </div>
 
-            <div class="flex flex-col md:flex-row items-center justify-around gap-12 game-card p-12">
-                <div class="relative">
-                    <div class="absolute -inset-4 bg-amber-500/10 blur-2xl rounded-full"></div>
-                    <div class="relative bg-black/60 w-80 h-80 rounded-full border-2 gold-border flex items-center justify-center overflow-hidden">
-                        <div id="vowelDisplay" class="text-[140px] serif gold-text leading-none transition-all duration-300"></div>
+            <!-- Stage 1: Consonant Principle -->
+            <div id="screen-stage1" class="hidden w-full animate-in">
+                <h3 class="text-2xl font-bold myeongjo mb-2">미션 1: 모양의 비밀</h3>
+                <p class="mb-6 text-gray-600 font-bold">발음 기관의 모양을 본떠 만든 자음을 찾아 매칭해봐!</p>
+                
+                <div class="grid grid-cols-2 gap-4 mb-8">
+                    <div id="q1-target" class="p-6 border-2 border-dashed border-gray-400 rounded-xl bg-gray-50">
+                        <p class="text-sm text-gray-500 mb-2 font-bold">[ 혀가 윗잇몸에 붙는 모양 ]</p>
+                        <div id="drop-zone" class="h-20 flex items-center justify-center text-4xl font-bold text-red-800">- ? -</div>
                     </div>
-                    <div id="vowelGoal" class="absolute -bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap bg-amber-600 text-black px-8 py-2 rounded-full font-bold text-lg shadow-xl">
-                        목표: <span class="font-black underline"></span>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div onclick="checkStage1('ㄱ')" class="card p-4 text-3xl font-bold flex items-center justify-center">ㄱ</div>
+                        <div onclick="checkStage1('ㄴ')" class="card p-4 text-3xl font-bold flex items-center justify-center">ㄴ</div>
+                        <div onclick="checkStage1('ㅁ')" class="card p-4 text-3xl font-bold flex items-center justify-center">ㅁ</div>
+                        <div onclick="checkStage1('ㅅ')" class="card p-4 text-3xl font-bold flex items-center justify-center">ㅅ</div>
                     </div>
                 </div>
-
-                <div class="flex flex-col gap-4 w-full max-w-sm">
-                    <button onclick="combineVowel('·')" class="bg-slate-800/50 hover:bg-sky-900/40 border border-white/10 p-6 rounded-2xl flex items-center justify-between group transition-all">
-                        <span class="text-4xl font-bold text-sky-400">·</span>
-                        <div class="text-right">
-                            <span class="text-slate-300 block font-bold">하늘 (天)</span>
-                            <span class="text-[10px] text-slate-500 uppercase">Heavenly Dot</span>
-                        </div>
-                    </button>
-                    <button onclick="combineVowel('ㅡ')" class="bg-slate-800/50 hover:bg-orange-900/40 border border-white/10 p-6 rounded-2xl flex items-center justify-between group transition-all">
-                        <span class="text-4xl font-bold text-orange-400">ㅡ</span>
-                        <div class="text-right">
-                            <span class="text-slate-300 block font-bold">땅 (地)</span>
-                            <span class="text-[10px] text-slate-500 uppercase">Earthly Line</span>
-                        </div>
-                    </button>
-                    <button onclick="combineVowel('ㅣ')" class="bg-slate-800/50 hover:bg-emerald-900/40 border border-white/10 p-6 rounded-2xl flex items-center justify-between group transition-all">
-                        <span class="text-4xl font-bold text-emerald-400">ㅣ</span>
-                        <div class="text-right">
-                            <span class="text-slate-300 block font-bold">사람 (人)</span>
-                            <span class="text-[10px] text-slate-500 uppercase">Human Being</span>
-                        </div>
-                    </button>
-                    <button onclick="resetVowel()" class="mt-4 text-slate-500 hover:text-white transition-colors text-sm flex items-center justify-center gap-2">
-                        <span>🔄</span> 조합 초기화
-                    </button>
-                </div>
+                <p id="feedback1" class="h-6 font-bold text-red-600"></p>
             </div>
-        </div>
 
-        <!-- Stage 3: 집현전 학사 도전 -->
-        <div id="stage3" class="hidden w-full max-w-6xl">
-            <div class="text-center mb-8">
-                <h3 class="text-4xl font-black serif mb-2 gold-text">Final Stage: 훈민정음 수호자</h3>
-                <p class="text-slate-400">떨어지는 조각들을 모아 완벽한 한글 단어를 조립하세요!</p>
-            </div>
-            
-            <div class="grid grid-cols-12 gap-6 h-[500px]">
-                <div class="col-span-8 relative bg-black/40 rounded-[2rem] border border-white/10 overflow-hidden shadow-inner" id="letterRainField">
-                    <!-- 떨어지는 글자 구역 -->
+            <!-- Stage 2: Vowel Principle (Cheon-Ji-In) -->
+            <div id="screen-stage2" class="hidden w-full animate-in">
+                <h3 class="text-2xl font-bold myeongjo mb-2">미션 2: 천·지·인의 조화</h3>
+                <p class="mb-6 text-gray-600 font-bold">하늘(·), 땅(ㅡ), 사람(ㅣ)을 합쳐 'ㅏ'를 만들어봐!</p>
+                
+                <div class="flex justify-center gap-4 mb-8">
+                    <button onclick="addToVowel('·')" class="w-16 h-16 rounded-full bg-blue-100 border-2 border-blue-400 text-2xl font-bold flex items-center justify-center">·</button>
+                    <button onclick="addToVowel('ㅡ')" class="w-16 h-16 rounded-full bg-green-100 border-2 border-green-400 text-2xl font-bold flex items-center justify-center">ㅡ</button>
+                    <button onclick="addToVowel('ㅣ')" class="w-16 h-16 rounded-full bg-yellow-100 border-2 border-yellow-400 text-2xl font-bold flex items-center justify-center">ㅣ</button>
                 </div>
                 
-                <div class="col-span-4 flex flex-col gap-6">
-                    <div class="game-card p-8 flex-grow">
-                        <p class="text-[10px] text-slate-500 uppercase tracking-widest mb-4">현재 목표 단어</p>
-                        <div id="targetWordDisplay" class="text-6xl font-black serif gold-text text-center py-8 bg-black/50 rounded-2xl border border-amber-900/20 mb-8">한글</div>
+                <div class="mb-8">
+                    <p class="text-sm text-gray-500 mb-2 font-bold">조합 결과:</p>
+                    <div id="vowel-result" class="text-6xl font-bold h-20 flex items-center justify-center tracking-widest text-red-900 bg-gray-50 rounded-xl w-64 mx-auto border-2 border-gray-200">
                         
-                        <p class="text-[10px] text-slate-500 uppercase tracking-widest mb-4">수집한 글자함</p>
-                        <div id="myLetters" class="flex flex-wrap gap-2 content-start min-h-[120px]">
-                            <!-- 보관함 -->
-                        </div>
                     </div>
-                    <button onclick="tryAssemble()" class="btn-gold py-6 rounded-2xl font-black text-xl shadow-2xl">
-                        글자 조립 (Assemble)
-                    </button>
                 </div>
+                
+                <div class="flex gap-4 justify-center">
+                    <button onclick="resetVowel()" class="px-6 py-2 bg-gray-200 rounded-lg font-bold">다시하기</button>
+                    <button onclick="checkStage2()" class="px-6 py-2 btn-korea rounded-lg font-bold">확인</button>
+                </div>
+                <p id="feedback2" class="h-6 mt-4 font-bold text-red-600"></p>
             </div>
+
+            <!-- Stage 3: Global Excellence Quiz -->
+            <div id="screen-stage3" class="hidden w-full animate-in">
+                <h3 class="text-2xl font-bold myeongjo mb-2">미션 3: 한글의 우수성</h3>
+                <p class="mb-6 text-gray-600 font-bold">유네스코에서 문맹 퇴치에 기여한 사람에게 주는 상의 이름은?</p>
+                
+                <div class="space-y-3 w-full max-w-xs mx-auto">
+                    <button onclick="checkStage3(1)" class="w-full p-4 border-2 rounded-xl font-bold text-lg hover:border-red-800 transition-colors">1. 장영실 문해상</button>
+                    <button onclick="checkStage3(2)" class="w-full p-4 border-2 rounded-xl font-bold text-lg hover:border-red-800 transition-colors">2. 세종대왕 문해상</button>
+                    <button onclick="checkStage3(3)" class="w-full p-4 border-2 rounded-xl font-bold text-lg hover:border-red-800 transition-colors">3. 이순신 교육상</button>
+                </div>
+                <p id="feedback3" class="h-6 mt-6 font-bold text-red-600"></p>
+            </div>
+
+            <!-- Final Screen -->
+            <div id="screen-final" class="hidden animate-in">
+                <div class="mb-6">
+                    <div class="text-6xl mb-4">📜</div>
+                    <h2 class="text-3xl font-extrabold myeongjo mb-4 text-red-900">탐험 성공!</h2>
+                    <p class="text-xl text-gray-700 font-bold mb-8 leading-relaxed">
+                        축하해! 너는 이제 훈민정음의<br>
+                        진정한 가치를 아는 학자가 되었어.
+                    </p>
+                    
+                    <div class="bg-red-50 border-2 border-red-200 p-6 rounded-2xl mb-8">
+                        <p class="text-red-800 text-2xl font-black myeongjo mb-2">최종 미션</p>
+                        <p class="text-xl font-bold text-gray-800">
+                            "ZEP으로 돌아가 <span class="text-red-600 underline">'훈민정음'</span>을 입력하시오"
+                        </p>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-400">화면을 닫고 다시 돌아가주세요.</p>
+            </div>
+        </main>
+
+        <!-- Footer Decor -->
+        <footer class="h-8 bg-[#8B0000] opacity-90"></footer>
+
+        <!-- Custom Notification Message -->
+        <div id="msg-box" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white p-6 rounded-2xl shadow-2xl border-4 border-red-800 hidden z-50 text-center min-w-[280px]">
+            <p id="msg-text" class="text-xl font-bold mb-4 text-gray-800"></p>
+            <button onclick="closeMsg()" class="btn-korea px-6 py-2 rounded-lg font-bold">확인</button>
         </div>
-
-        <!-- 결과 화면 -->
-        <div id="resultScreen" class="hidden text-center max-w-xl game-card p-16 border-2 gold-border shadow-[0_0_100px_rgba(212,175,55,0.15)]">
-            <div class="text-8xl mb-8 animate-bounce">📜</div>
-            <h2 class="text-4xl font-black mb-4 serif gold-text tracking-tighter">집현전 수석 학사 등극!</h2>
-            <p class="text-slate-300 mb-10 leading-relaxed text-lg">
-                훈민정음의 과학적 우수성을 완벽히 증명하셨습니다.<br>
-                이제 세종대왕님의 비밀 암호를 가지고 돌아가세요.
-            </p>
-            
-            <div class="bg-black p-8 rounded-3xl mb-12 border border-amber-900/30">
-                <p class="text-[10px] text-slate-500 mb-2 tracking-widest uppercase">Secret Mission Code</p>
-                <div class="text-3xl font-black gold-text py-4 px-6 border-2 border-dashed gold-border bg-amber-900/10">
-                    ZEP으로 돌아가 훈민정음을 입력하시오
-                </div>
-            </div>
-
-            <div class="flex gap-4">
-                <button onclick="location.reload()" class="flex-1 bg-slate-800 hover:bg-slate-700 py-4 rounded-2xl font-bold transition-all border border-white/10">
-                    다시 하기
-                </div>
-                <button onclick="document.execCommand('copy')" class="flex-1 btn-gold py-4 rounded-2xl font-bold">
-                    코드 복사
-                </button>
-            </div>
-        </div>
-
-    </main>
+    </div>
 
     <script>
-        let score = 0;
-        let selectedBase = null;
-        let timerInterval;
-        let timeLeft = 45;
-        let spawnInterval;
+        let currentStage = 0;
+        let vowelState = "";
 
-        const s1Data = {
-            bases: [
-                { char: 'ㄱ', desc: '어금닛소리 (혀뿌리가 목구멍을 막음)', type: 'base' },
-                { char: 'ㄴ', desc: '혓소리 (혀가 윗잇몸에 붙음)', type: 'base' },
-                { char: 'ㅁ', desc: '입술소리 (입의 모양)', type: 'base' },
-                { char: 'ㅅ', desc: '잇소리 (이의 모양)', type: 'base' },
-                { char: 'ㅇ', desc: '목구멍소리 (목구멍 모양)', type: 'base' }
-            ],
-            extra: {
-                'ㄱ': 'ㅋ',
-                'ㄴ': 'ㄷ', 'ㄷ': 'ㅌ',
-                'ㅁ': 'ㅂ', 'ㅂ': 'ㅍ',
-                'ㅅ': 'ㅈ', 'ㅈ': 'ㅊ',
-                'ㅇ': 'ㅎ'
-            },
-            targets: ['ㅋ', 'ㄷ', 'ㅌ', 'ㅂ', 'ㅍ', 'ㅈ', 'ㅊ', 'ㅎ']
-        };
-
-        const s2Data = [
-            { target: 'ㅏ', formula: 'ㅣ·' },
-            { target: 'ㅓ', formula: '·ㅣ' },
-            { target: 'ㅗ', formula: '·ㅡ' },
-            { target: 'ㅜ', formula: 'ㅡ·' },
-            { target: 'ㅑ', formula: 'ㅣ··' },
-            { target: 'ㅕ', formula: '··ㅣ' }
-        ];
-        let s2Index = 0;
-        let currentVowelCombo = "";
-
-        const s3Words = ["과학", "지혜", "세종", "정음", "훈민"];
-        let s3Index = 0;
-        let myLetters = [];
-
-        function showScreen(screenId) {
-            ['startScreen', 'stage1', 'stage2', 'stage3', 'resultScreen'].forEach(id => {
-                document.getElementById(id).classList.add('hidden');
-            });
-            const target = document.getElementById(screenId);
-            target.classList.remove('hidden');
-            target.classList.add('animate-in', 'fade-in', 'duration-500');
+        function showMsg(text) {
+            document.getElementById('msg-text').innerText = text;
+            document.getElementById('msg-box').classList.remove('hidden');
         }
 
-        function addScore(points) {
-            score += points;
-            document.getElementById('scoreDisplay').innerText = score.toString().padStart(4, '0');
+        function closeMsg() {
+            document.getElementById('msg-box').classList.add('hidden');
         }
 
-        function showToast(text, isError = false) {
-            const toast = document.createElement('div');
-            toast.className = `fixed bottom-10 left-1/2 transform -translate-x-1/2 px-10 py-4 rounded-2xl text-white font-bold shadow-2xl z-[100] transition-all duration-300 ${isError ? 'bg-red-600' : 'bg-amber-600'}`;
-            toast.innerText = text;
-            document.body.appendChild(toast);
-            setTimeout(() => {
-                toast.style.opacity = '0';
-                setTimeout(() => toast.remove(), 300);
-            }, 2000);
+        function startGame() {
+            document.getElementById('screen-start').classList.add('hidden');
+            document.getElementById('screen-stage1').classList.remove('hidden');
+            document.getElementById('progress').innerText = "진행도: 1 / 3";
         }
 
-        function initStage1() {
-            showScreen('stage1');
-            const baseContainer = document.getElementById('baseConsonants');
-            const targetContainer = document.getElementById('targetConsonants');
-            baseContainer.innerHTML = '';
-            targetContainer.innerHTML = '';
-
-            s1Data.bases.forEach(item => {
-                const btn = document.createElement('button');
-                btn.className = "w-full p-5 bg-slate-800/40 rounded-2xl border border-white/5 flex items-center justify-between hover:border-white/20 transition-all group";
-                btn.innerHTML = `
-                    <div class="flex flex-col text-left">
-                        <span class="text-3xl font-black gold-text mb-1">${item.char}</span>
-                        <span class="text-[10px] text-slate-500 uppercase font-bold">${item.desc}</span>
-                    </div>
-                    <span class="opacity-0 group-hover:opacity-100 transition-opacity">✨</span>
-                `;
-                btn.onclick = () => {
-                    document.querySelectorAll('#baseConsonants button').forEach(b => b.classList.remove('gold-border', 'bg-slate-700/50'));
-                    btn.classList.add('gold-border', 'bg-slate-700/50');
-                    selectedBase = item.char;
-                };
-                baseContainer.appendChild(btn);
-            });
-
-            s1Data.targets.forEach(t => {
-                const box = document.createElement('div');
-                box.id = `target-${t}`;
-                box.className = "h-24 bg-black/50 border border-white/5 rounded-2xl flex items-center justify-center text-4xl font-black text-slate-800 transition-all";
-                box.innerText = t;
-                targetContainer.appendChild(box);
-            });
-
-            document.getElementById('strokeTool').onclick = () => {
-                if (!selectedBase) {
-                    showToast("먼저 기본 자음을 선택하세요!", true);
-                    return;
-                }
-                
-                let next = s1Data.extra[selectedBase];
-                if (next) {
-                    const targetEl = document.getElementById(`target-${next}`);
-                    if (targetEl && targetEl.classList.contains('text-slate-800')) {
-                        targetEl.classList.remove('text-slate-800');
-                        targetEl.classList.add('gold-text', 'stroke-animation', 'border-amber-900/50', 'bg-amber-900/10');
-                        addScore(100);
-                        selectedBase = next; // 다음 단계로 연속 가획 가능
-                        checkStage1Complete();
-                    } else {
-                        showToast("이미 이 계열의 획은 추가되었습니다.");
-                    }
-                } else {
-                    showToast("이 글자는 더 이상 획을 더할 수 없습니다.", true);
-                }
-            };
-        }
-
-        function checkStage1Complete() {
-            const remaining = document.querySelectorAll('#targetConsonants .text-slate-800').length;
-            if (remaining === 0) {
-                setTimeout(() => {
-                    showToast("완벽합니다! 소리가 세질수록 모양이 복잡해지는 원리를 깨우치셨네요.");
-                    startStage(2);
-                }, 1000);
-            }
-        }
-
-        function initStage2() {
-            showScreen('stage2');
-            updateVowelTarget();
-        }
-
-        function updateVowelTarget() {
-            if (s2Index >= s2Data.length) {
-                showToast("천지인의 조화가 완성되었습니다!");
-                startStage(3);
-                return;
-            }
-            document.querySelector('#vowelGoal span').innerText = s2Data[s2Index].target;
-            currentVowelCombo = "";
-            document.getElementById('vowelDisplay').innerText = "";
-        }
-
-        function combineVowel(char) {
-            currentVowelCombo += char;
-            document.getElementById('vowelDisplay').innerText = currentVowelCombo;
+        function checkStage1(answer) {
+            const dropZone = document.getElementById('drop-zone');
+            const feedback = document.getElementById('feedback1');
             
-            if (currentVowelCombo === s2Data[s2Index].formula) {
-                document.getElementById('vowelDisplay').innerText = s2Data[s2Index].target;
-                document.getElementById('vowelDisplay').classList.add('scale-125');
-                setTimeout(() => document.getElementById('vowelDisplay').classList.remove('scale-125'), 300);
-                addScore(150);
-                s2Index++;
-                setTimeout(updateVowelTarget, 800);
-            } else if (currentVowelCombo.length >= 3) {
-                document.getElementById('vowelDisplay').classList.add('vibrate', 'text-red-500');
+            if (answer === 'ㄴ') {
+                dropZone.innerText = 'ㄴ';
+                dropZone.classList.add('text-green-600');
+                feedback.innerText = "정답이야! 'ㄴ'은 혀가 윗잇몸에 붙는 모양을 본떴어.";
                 setTimeout(() => {
-                    document.getElementById('vowelDisplay').classList.remove('vibrate', 'text-red-500');
-                    resetVowel();
-                }, 500);
+                    document.getElementById('screen-stage1').classList.add('hidden');
+                    document.getElementById('screen-stage2').classList.remove('hidden');
+                    document.getElementById('progress').innerText = "진행도: 2 / 3";
+                }, 2000);
+            } else {
+                feedback.innerText = "다시 한번 생각해볼까? 입 모양을 잘 떠올려봐!";
+                setTimeout(() => { feedback.innerText = ""; }, 1500);
+            }
+        }
+
+        function addToVowel(char) {
+            if (vowelState.length < 3) {
+                vowelState += char;
+                document.getElementById('vowel-result').innerText = vowelState;
             }
         }
 
         function resetVowel() {
-            currentVowelCombo = "";
-            document.getElementById('vowelDisplay').innerText = "";
+            vowelState = "";
+            document.getElementById('vowel-result').innerText = "";
         }
 
-        function initStage3() {
-            showScreen('stage3');
-            document.getElementById('timerContainer').classList.remove('hidden');
-            startTimer();
-            updateWordTarget();
-            spawnInterval = setInterval(spawnFallingLetter, 1200);
-        }
-
-        function startTimer() {
-            timerInterval = setInterval(() => {
-                timeLeft--;
-                document.getElementById('gameTimer').innerText = timeLeft;
-                if (timeLeft <= 0) {
-                    clearInterval(timerInterval);
-                    clearInterval(spawnInterval);
-                    finishGame();
-                }
-            }, 1000);
-        }
-
-        function updateWordTarget() {
-            if (s3Index >= s3Words.length) {
-                clearInterval(timerInterval);
-                clearInterval(spawnInterval);
-                finishGame();
-                return;
-            }
-            document.getElementById('targetWordDisplay').innerText = s3Words[s3Index];
-            myLetters = [];
-            renderInventory();
-        }
-
-        function spawnFallingLetter() {
-            const field = document.getElementById('letterRainField');
-            const chars = "ㄱㄴㄷㄹㅁㅂㅅㅇㅈㅊㅋㅌㅍㅎㅏㅑㅓㅕㅗㅛㅜㅠㅡㅣ";
-            const char = chars[Math.floor(Math.random() * chars.length)];
-            
-            const el = document.createElement('div');
-            el.className = "falling-letter w-14 h-14 bg-slate-900/80 border gold-border rounded-2xl flex items-center justify-center font-black text-2xl cursor-pointer hover:bg-slate-700 z-10 shadow-lg";
-            el.innerText = char;
-            el.style.left = Math.random() * (field.clientWidth - 70) + "px";
-            
-            let pos = -70;
-            const speed = 2 + (s3Index * 0.4);
-            const fall = setInterval(() => {
-                pos += speed;
-                el.style.top = pos + "px";
-                if (pos > field.clientHeight) {
-                    clearInterval(fall);
-                    if (el.parentNode) field.removeChild(el);
-                }
-            }, 20);
-
-            el.onclick = () => {
-                if (myLetters.length < 12) {
-                    myLetters.push(char);
-                    renderInventory();
-                    clearInterval(fall);
-                    if (el.parentNode) field.removeChild(el);
-                }
-            };
-            field.appendChild(el);
-        }
-
-        function renderInventory() {
-            const inv = document.getElementById('myLetters');
-            inv.innerHTML = '';
-            myLetters.forEach((l, idx) => {
-                const item = document.createElement('div');
-                item.className = "w-10 h-10 bg-slate-800 border border-white/10 rounded-lg flex items-center justify-center text-sm font-bold cursor-pointer hover:bg-red-900/30 hover:border-red-500 transition-all";
-                item.innerText = l;
-                item.onclick = () => {
-                    myLetters.splice(idx, 1);
-                    renderInventory();
-                };
-                inv.appendChild(item);
-            });
-        }
-
-        function tryAssemble() {
-            const target = s3Words[s3Index];
-            // 교육적 시뮬레이션: 글자 구성 요소가 충분한지 체크 (자음 2개 이상, 모음 2개 이상 모였을 때)
-            const consonants = myLetters.filter(l => "ㄱㄴㄷㄹㅁㅂㅅㅇㅈㅊㅋㅌㅍㅎ".includes(l)).length;
-            const vowels = myLetters.filter(l => "ㅏㅑㅓㅕㅗㅛㅜㅠㅡㅣ".includes(l)).length;
-
-            if (consonants >= 2 && vowels >= 2) {
-                showToast(`단어 '${target}' 조립 성공!`);
-                addScore(500);
-                s3Index++;
-                timeLeft += 10; // 시간 보너스
-                updateWordTarget();
+        function checkStage2() {
+            const feedback = document.getElementById('feedback2');
+            // 'ㅏ' is made of ㅣ + ·
+            if (vowelState.includes('ㅣ') && vowelState.includes('·')) {
+                document.getElementById('vowel-result').innerText = "ㅏ";
+                feedback.innerText = "훌륭해! 사람(ㅣ)과 하늘(·)이 만나 'ㅏ'가 되었어.";
+                setTimeout(() => {
+                    document.getElementById('screen-stage2').classList.add('hidden');
+                    document.getElementById('screen-stage3').classList.remove('hidden');
+                    document.getElementById('progress').innerText = "진행도: 3 / 3";
+                }, 2000);
             } else {
-                showToast("재료가 부족합니다! (자음과 모음을 더 모으세요)", true);
-                score = Math.max(0, score - 50);
-                addScore(0);
+                feedback.innerText = "조합이 맞지 않아. ㅣ와 ·를 합쳐보자!";
+                setTimeout(() => { feedback.innerText = ""; }, 1500);
             }
         }
 
-        function startStage(n) {
-            if (n === 1) initStage1();
-            if (n === 2) initStage2();
-            if (n === 3) initStage3();
+        function checkStage3(num) {
+            const feedback = document.getElementById('feedback3');
+            if (num === 2) {
+                feedback.classList.remove('text-red-600');
+                feedback.classList.add('text-green-600');
+                feedback.innerText = "맞았어! 전 세계가 인정하는 최고의 문자지!";
+                setTimeout(() => {
+                    document.getElementById('screen-stage3').classList.add('hidden');
+                    document.getElementById('screen-final').classList.remove('hidden');
+                    document.getElementById('progress').innerText = "미션 완료";
+                }, 2000);
+            } else {
+                feedback.innerText = "아쉽지만 틀렸어. 우리 민족의 위대한 왕을 생각해봐!";
+                setTimeout(() => { feedback.innerText = ""; }, 1500);
+            }
         }
 
-        function finishGame() {
-            showScreen('resultScreen');
-            document.getElementById('timerContainer').classList.add('hidden');
-            document.getElementById('finalScore')?.remove(); // 중복 방지
-            const res = document.getElementById('resultScreen');
-            const scoreDiv = document.createElement('div');
-            scoreDiv.id = "finalScore";
-            scoreDiv.className = "text-5xl font-black gold-text mb-4";
-            scoreDiv.innerText = `최종 점수: ${score}`;
-            res.insertBefore(scoreDiv, res.querySelector('p'));
-        }
-
-        // 초기 시작
-        window.onload = () => {
-            // 초기 점수판 세팅 등
-        };
+        // Prevent zoom on double tap
+        document.addEventListener('touchstart', function(event) {
+            if (event.touches.length > 1) {
+                event.preventDefault();
+            }
+        }, { passive: false });
     </script>
 </body>
 </html>

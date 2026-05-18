@@ -149,7 +149,7 @@
         <!-- 메인 채팅 화면 (기본적으로 숨김 상태) -->
         <div id="chat-screen" class="hidden flex-1 flex flex-col lg:flex-row overflow-hidden">
             
-            <!-- 왼쪽: 인물 요약 프로필 사이드바 -->
+            <!-- ① 왼쪽: 인물 요약 프로필 사이드바 -->
             <aside class="w-full lg:w-80 bg-[#FCFAF5] border-b lg:border-b-0 lg:border-r border-[#ECE6D9] p-5 flex flex-col justify-between">
                 <div>
                     <!-- 인물 정보 영역 -->
@@ -189,7 +189,7 @@
                 </div>
             </aside>
 
-            <!-- 오른쪽: 실시간 챗봇 인터랙션 영역 -->
+            <!-- ② 오른쪽: 실시간 챗봇 인터랙션 영역 -->
             <section class="flex-1 flex flex-col bg-white">
                 
                 <!-- 상단 말머리/안내 정보 -->
@@ -262,7 +262,7 @@
             '안중근': {
                 emoji: '🕶️',
                 title: '대한의군 참모중장 · 독립유공자 건국훈장 대한민국장',
-                bio: '1879년 황해도에서 태어나 하얼빈역에서 이토 히로부미를 저단하여 일제의 침략 야욕을 전 세계에 알렸습니다. 동양의 영구적인 평화를 기원하는 "동양평화론"을 뤼순 감옥 안에서 주창했습니다.',
+                bio: '1879년 황해도에서 태어나 하얼빈역에서 이토 히로부미를 처단하여 일제의 침략 야욕을 전 세계에 알렸습니다. 동양의 영구적인 평화를 기원하는 "동양평화론"을 뤼순 감옥 안에서 주창했습니다.',
                 curriculum: '6학년 1학기 사회 [나라를 되찾으려는 노력] 단원 연계. 하얼빈 의거의 의미와 동양평화론 사상, 굳건했던 애국 지조를 중점적으로 학습할 수 있습니다.',
                 systemPrompt: `너는 지금부터 1909년 하얼빈 의거를 단행하고 조국의 독립과 평화를 위해 당당하게 순국한 안중근 의사야. 
 역사적 고증에 근거한 너의 가치관과 곧은 마음을 담아 친절하지만 흔들리지 않는 굳건하고 엄숙한 기개의 말투를 써줘. 
@@ -285,7 +285,7 @@
 말투는 기본적으로 정성스러운 존댓말(~했답니다, ~했지요, ~에요)을 사용해주며, 학생을 "아름다운 꿈나무", "어린 동생들"이라고 친근하게 불러주세요.`,
                 chips: [
                     "만세 운동을 하실 때 무섭지는 않으셨나요?",
-                    "어린 나이에 왜 독립운동에 앞장서게 되셨나요?",
+                    "어린 나이에 왜 독립운동에 앞장게 되셨나요?",
                     "옥중에서도 매일 독립 만세를 외치셨던 비결이 무엇인가요?",
                     "지금의 초등학생들이 나라를 지키려면 어떤 마음을 가져야 할까요?"
                 ]
@@ -297,7 +297,7 @@
                 curriculum: '6학년 1학기 사회 [대한민국 임시정부의 활동] 단원 연계. 임시정부를 고달픈 재정 환경 속에서도 끝까지 수호한 백범의 끈기와 평화와 무력 침략이 없는 "문화의 힘"에 대한 깊은 사상을 이해합니다.',
                 systemPrompt: `너는 지금부터 평생을 독립운동에 헌신하고 대한민국 임시정부를 수호한 백범 김구 주석이야. 
 인자하고 마음이 넓으며 연륜이 깊은 독립운동가 할아버지의 푸근하면서도 엄중하고 따뜻한 영혼의 무게가 느껴지는 목소리로 대답해줘. 
-어투는 구수한 이웃집 할아버지 같으면서도 우직한 어조(~라네, ~했지, ~소이다, ~였구려)를 사용하여 격려해주세요. 
+어투는 구수한 이웃집 할아버지 같으면서도 우직한 어조 (~라네, ~했지, ~소이다, ~였구려)를 사용하여 격려해주세요. 
 학생들을 "어린 백성", "귀한 조국의 자손들" 혹은 "우리 새싹들"이라 칭하고, 김구 선생의 상징적인 명문장들(나의 소원 등)을 자연스레 섞어서 교훈적으로 인도해줘.`,
                 chips: [
                     "선생님의 소원이 왜 첫째도, 둘째도, 셋째도 '우리나라의 완전한 자주독립'이었나요?",
@@ -460,7 +460,7 @@
             }
             appendMessage(name, welcomeText, true, emoji);
             
-            // 최초 멀티턴 프롬프트 구조화용 주입
+            // 최초 멀티턴 프롬프트 구조화용 주입 (Gemini API는 user -> model 번갈아가며 진행해야 함)
             chatHistory.push({
                 role: "user",
                 parts: [{ text: `안녕? 너는 지금부터 위의 지정된 시스템 프롬프트의 가상 인물로 변해서, 나에게 조근조근 친절히 대답해 줘.` }]
@@ -471,7 +471,7 @@
             });
         }
 
-        // 메시지 전송 및 Gemini API 연결 로직
+        // 메시지 전송 및 Gemini API 연결 로직 (오류 수정 완료)
         async function sendMessage() {
             const inputEl = document.getElementById('chat-input');
             const userText = inputEl.value.trim();
@@ -505,9 +505,9 @@
                 parts: [{ text: userText }]
             });
 
-            // 3. API Fetch 수행 (지정된 모델: gemini-3-flash-preview)
-            const apiKey = ""; // Runtime 환경에서 제공됨
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+            // 3. API Fetch 수행 (안정성이 뛰어난 gemini-2.5-flash-preview-09-2025로 수정)
+            const apiKey = ""; // Runtime 환경에서 자동으로 주입됨
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
 
             const payload = {
                 contents: chatHistory,
@@ -516,10 +516,9 @@
                 }
             };
 
-            // 에러 핸들링을 동반한 호출 시도 (최대 3회 지수 백오프)
             let responseText = "";
             let attempt = 0;
-            const maxAttempts = 3;
+            const maxAttempts = 5; // 5회 지수 백오프 지원
             let delay = 1000;
 
             while (attempt < maxAttempts) {
@@ -531,21 +530,23 @@
                     });
 
                     if (!response.ok) {
-                        throw new Error(`API response status: ${response.status}`);
+                        const errorMsg = await response.text();
+                        throw new Error(`API response status: ${response.status}, Detail: ${errorMsg}`);
                     }
 
                     const result = await response.json();
-                    const candidate = result.candidates?.[0];
-                    if (candidate && candidate.content?.parts?.[0]?.text) {
-                        responseText = candidate.content.parts[0].text;
+                    const candidateText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                    if (candidateText) {
+                        responseText = candidateText;
                         break; // 성공 시 루프 탈출
                     } else {
-                        throw new Error("비정상적인 응답 데이터 구조");
+                        throw new Error("비정상적인 응답 데이터 구조이거나 답변 후보가 없습니다.");
                     }
                 } catch (error) {
+                    console.error(`Attempt ${attempt + 1} failed:`, error);
                     attempt++;
                     if (attempt >= maxAttempts) {
-                        responseText = "미안하오, 조국의 바람 소리가 너무 거세어 그대의 전언이 잠시 가려졌구려. (네트워크 지연 또는 일시적 중단이 발생했습니다. 잠시 후 질문을 다시 보내주세요.)";
+                        responseText = `미안하오, 조국의 바람 소리가 너무 거세어 그대의 전언이 잠시 가려졌구려. (연결에 어려움이 있습니다. 잠시 후 질문을 다시 입력해보거나 네트워크 연결을 점검해주세요.) \n\n*상세 오류 정보: ${error.message}*`;
                     } else {
                         // 지수 백오프 대기
                         await new Promise(resolve => setTimeout(resolve, delay));

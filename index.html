@@ -3,259 +3,578 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>훈민정음 탐험대</title>
+    <title>역사의 외침: 독립운동가와의 대화</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&family=Nanum+Gothic:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Google Fonts: 한국적인 조화로운 폰트 -->
+    <link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --korean-red: #8B0000;
-            --korean-gold: #D4AF37;
-            --paper-bg: #F4F1EA;
-        }
         body {
-            font-family: 'Nanum Gothic', sans-serif;
-            background-color: var(--paper-bg);
-            touch-action: manipulation;
-            overflow: hidden;
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #F8F6F0; /* 한지 느낌의 부드러운 배경색 */
         }
-        .myeongjo { font-family: 'Nanum Myeongjo', serif; }
-        .hanok-border {
-            border: 8px double var(--korean-red);
-            border-radius: 15px;
+        .myeongjo {
+            font-family: 'Nanum Myeongjo', serif;
         }
-        .btn-korea {
-            background-color: var(--korean-red);
-            color: white;
-            transition: all 0.3s;
-            box-shadow: 0 4px 0px #5a0000;
+        /* 한국 전통 문양 스크롤바 디자인 */
+        ::-webkit-scrollbar {
+            width: 6px;
         }
-        .btn-korea:active {
-            transform: translateY(4px);
-            box-shadow: 0 0px 0px #5a0000;
+        ::-webkit-scrollbar-track {
+            background: #EFECE3;
         }
-        .card {
-            background: white;
-            border: 2px solid #ddd;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: transform 0.2s;
+        ::-webkit-scrollbar-thumb {
+            background: #8A1A1A;
+            border-radius: 3px;
         }
-        .card:active { transform: scale(0.95); }
-        .correct { background-color: #d1fae5 !important; border-color: #10b981 !important; }
-        .wrong { background-color: #fee2e2 !important; border-color: #ef4444 !important; }
+        /* 말풍선 자연스러운 그림자 및 트랜지션 */
+        .chat-bubble {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            transition: all 0.2s ease-in-out;
+        }
+        /* 한국 전통색 변수 설정 */
+        .color-traditional-red { color: #8A1A1A; }
+        .bg-traditional-red { background-color: #8A1A1A; }
+        .border-traditional-red { border-color: #8A1A1A; }
+        .bg-traditional-gold { background-color: #D4AF37; }
+        .color-traditional-gold { color: #D4AF37; }
         
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        /* 반짝이는 애니메이션 */
+        @keyframes pulse-light {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
         }
-        .animate-in { animation: fadeIn 0.5s ease-out forwards; }
+        .pulse-loader {
+            animation: pulse-light 1.5s infinite;
+        }
     </style>
 </head>
-<body class="flex items-center justify-center min-h-screen p-4">
+<body class="flex items-center justify-center min-h-screen p-3 md:p-6 overflow-x-hidden">
 
-    <div id="game-container" class="w-full max-w-4xl h-[90vh] bg-white hanok-border shadow-2xl relative flex flex-col overflow-hidden">
+    <!-- 전체 앱 컨테이너 (태블릿 최적화 비율 및 맥스 사이즈) -->
+    <div id="app-container" class="w-full max-w-5xl h-[92vh] bg-[#FAF8F5] border-8 border-[#3A332D] rounded-2xl shadow-2xl overflow-hidden flex flex-col relative">
         
-        <!-- Header -->
-        <header class="p-4 border-b-2 border-red-800 flex justify-between items-center bg-[#fdfaf5]">
-            <h1 class="text-xl md:text-2xl font-bold myeongjo text-red-900">훈민정음 탐험대</h1>
-            <div id="progress" class="text-sm font-bold text-gray-600">진행도: 1 / 3</div>
+        <!-- 고풍스러운 처마 패턴 및 헤더 영역 -->
+        <header class="bg-[#3A332D] text-[#ECE6D9] py-4 px-6 flex justify-between items-center border-b-4 border-[#8A1A1A]">
+            <div class="flex items-center space-x-3">
+                <span class="text-2xl">🇰🇷</span>
+                <div>
+                    <h1 class="text-lg md:text-xl font-bold myeongjo tracking-widest text-[#F0EAE1]">독립의 그날을 묻다</h1>
+                    <p class="text-[10px] md:text-xs text-stone-400 font-light tracking-wider">초등학교 6학년 역사 탐구 프로젝트</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-2">
+                <span class="text-xs bg-[#8A1A1A] text-white px-2 py-1 rounded-md font-bold text-[10px] md:text-xs">역사 대화방</span>
+                <button id="home-btn" onclick="goToLobby()" class="hidden text-xs bg-stone-700 hover:bg-stone-600 px-3 py-1.5 rounded text-white font-medium transition-colors">인물 다시 고르기</button>
+            </div>
         </header>
 
-        <!-- Main Content Area -->
-        <main id="content" class="flex-1 p-6 flex flex-col items-center justify-center text-center">
-            <!-- Start Screen -->
-            <div id="screen-start" class="animate-in">
-                <div class="mb-6">
-                    <img src="https://placehold.co/200x200/8B0000/FFFFFF?text=훈민정음" alt="Sejong" class="mx-auto rounded-full border-4 border-gold-500 shadow-lg mb-4">
-                    <h2 class="text-3xl font-extrabold myeongjo mb-4 text-gray-800">세종대왕의 비밀 코드</h2>
-                    <p class="text-lg text-gray-600 mb-8 leading-relaxed">
-                        안녕, 6학년 친구들!<br>
-                        세상에서 가장 과학적인 글자, 훈민정음의 비밀을<br>
-                        함께 풀어보지 않겠니?
-                    </p>
-                </div>
-                <button onclick="startGame()" class="btn-korea px-12 py-4 rounded-full text-xl font-bold">탐험 시작하기</button>
+        <!-- 로비 화면: 독립운동가 인물 선택 창 -->
+        <div id="lobby-screen" class="flex-1 overflow-y-auto p-4 md:p-8 flex flex-col justify-between">
+            <div class="text-center max-w-2xl mx-auto mb-6 md:mb-10">
+                <span class="inline-block bg-[#EFECE3] border border-[#D4AF37] text-[#8A1A1A] px-4 py-1.5 rounded-full text-xs font-bold mb-3 tracking-wider">교과서 밖 역사의 거인들</span>
+                <h2 class="text-2xl md:text-3xl font-extrabold myeongjo text-[#3A332D] mb-3 leading-snug">시간을 뛰어넘어 마주하는 위대한 영혼</h2>
+                <p class="text-sm text-stone-600 leading-relaxed">
+                    조국의 자유와 독립을 위해 목숨을 아끼지 않으셨던 영웅들의 삶을 조명합니다. 대화하고 싶은 독립운동가를 직접 선택하고, 그날의 용기있는 고뇌와 사랑을 나누어 보아요.
+                </p>
             </div>
 
-            <!-- Stage 1: Consonant Principle -->
-            <div id="screen-stage1" class="hidden w-full animate-in">
-                <h3 class="text-2xl font-bold myeongjo mb-2">미션 1: 모양의 비밀</h3>
-                <p class="mb-6 text-gray-600 font-bold">발음 기관의 모양을 본떠 만든 자음을 찾아 매칭해봐!</p>
+            <!-- 인물 그리드 영역 -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 max-w-5xl mx-auto w-full mb-6">
                 
-                <div class="grid grid-cols-2 gap-4 mb-8">
-                    <div id="q1-target" class="p-6 border-2 border-dashed border-gray-400 rounded-xl bg-gray-50">
-                        <p class="text-sm text-gray-500 mb-2 font-bold">[ 혀가 윗잇몸에 붙는 모양 ]</p>
-                        <div id="drop-zone" class="h-20 flex items-center justify-center text-4xl font-bold text-red-800">- ? -</div>
+                <!-- 1. 안중근 -->
+                <div onclick="selectActivist('안중근')" class="group cursor-pointer bg-white rounded-xl border-2 border-[#E3DEC3] p-4 text-center hover:border-[#8A1A1A] hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 flex flex-col justify-between h-full">
+                    <div>
+                        <div class="w-16 h-16 mx-auto rounded-full bg-stone-100 border-2 border-[#8A1A1A] flex items-center justify-center text-3xl mb-3 shadow-inner group-hover:bg-[#FCF9F2]">🕶️</div>
+                        <h3 class="text-base font-bold text-stone-800 myeongjo group-hover:text-[#8A1A1A]">안중근 의사</h3>
+                        <p class="text-[11px] text-[#D4AF37] font-semibold mb-2">대한의군 참모중장</p>
+                        <p class="text-xs text-stone-500 leading-relaxed font-light">"동양의 평화와 조국의 완전한 독립을 위하여 내 생명을 바치노라."</p>
                     </div>
-                    <div class="grid grid-cols-2 gap-2">
-                        <div onclick="checkStage1('ㄱ')" class="card p-4 text-3xl font-bold flex items-center justify-center">ㄱ</div>
-                        <div onclick="checkStage1('ㄴ')" class="card p-4 text-3xl font-bold flex items-center justify-center">ㄴ</div>
-                        <div onclick="checkStage1('ㅁ')" class="card p-4 text-3xl font-bold flex items-center justify-center">ㅁ</div>
-                        <div onclick="checkStage1('ㅅ')" class="card p-4 text-3xl font-bold flex items-center justify-center">ㅅ</div>
+                    <span class="inline-block mt-4 text-[11px] text-[#8A1A1A] font-bold py-1 px-3 bg-[#FCF9F2] rounded-full border border-[#ECE6D9] group-hover:bg-[#8A1A1A] group-hover:text-white transition-all">대화 나누기 →</span>
+                </div>
+
+                <!-- 2. 유관순 -->
+                <div onclick="selectActivist('유관순')" class="group cursor-pointer bg-white rounded-xl border-2 border-[#E3DEC3] p-4 text-center hover:border-[#8A1A1A] hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 flex flex-col justify-between h-full">
+                    <div>
+                        <div class="w-16 h-16 mx-auto rounded-full bg-stone-100 border-2 border-[#8A1A1A] flex items-center justify-center text-3xl mb-3 shadow-inner group-hover:bg-[#FCF9F2]">🌸</div>
+                        <h3 class="text-base font-bold text-stone-800 myeongjo group-hover:text-[#8A1A1A]">유관순 열사</h3>
+                        <p class="text-[11px] text-[#D4AF37] font-semibold mb-2">아우내 만세 운동 주도</p>
+                        <p class="text-xs text-stone-500 leading-relaxed font-light font-light">"나라를 바칠 목숨이 오직 하나밖에 없는 것이 이 소녀의 유일한 슬픔입니다."</p>
                     </div>
+                    <span class="inline-block mt-4 text-[11px] text-[#8A1A1A] font-bold py-1 px-3 bg-[#FCF9F2] rounded-full border border-[#ECE6D9] group-hover:bg-[#8A1A1A] group-hover:text-white transition-all">대화 나누기 →</span>
                 </div>
-                <p id="feedback1" class="h-6 font-bold text-red-600"></p>
-            </div>
 
-            <!-- Stage 2: Vowel Principle (Cheon-Ji-In) -->
-            <div id="screen-stage2" class="hidden w-full animate-in">
-                <h3 class="text-2xl font-bold myeongjo mb-2">미션 2: 천·지·인의 조화</h3>
-                <p class="mb-6 text-gray-600 font-bold">하늘(·), 땅(ㅡ), 사람(ㅣ)을 합쳐 'ㅏ'를 만들어봐!</p>
-                
-                <div class="flex justify-center gap-4 mb-8">
-                    <button onclick="addToVowel('·')" class="w-16 h-16 rounded-full bg-blue-100 border-2 border-blue-400 text-2xl font-bold flex items-center justify-center">·</button>
-                    <button onclick="addToVowel('ㅡ')" class="w-16 h-16 rounded-full bg-green-100 border-2 border-green-400 text-2xl font-bold flex items-center justify-center">ㅡ</button>
-                    <button onclick="addToVowel('ㅣ')" class="w-16 h-16 rounded-full bg-yellow-100 border-2 border-yellow-400 text-2xl font-bold flex items-center justify-center">ㅣ</button>
-                </div>
-                
-                <div class="mb-8">
-                    <p class="text-sm text-gray-500 mb-2 font-bold">조합 결과:</p>
-                    <div id="vowel-result" class="text-6xl font-bold h-20 flex items-center justify-center tracking-widest text-red-900 bg-gray-50 rounded-xl w-64 mx-auto border-2 border-gray-200">
-                        
+                <!-- 3. 김구 -->
+                <div onclick="selectActivist('김구')" class="group cursor-pointer bg-white rounded-xl border-2 border-[#E3DEC3] p-4 text-center hover:border-[#8A1A1A] hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 flex flex-col justify-between h-full">
+                    <div>
+                        <div class="w-16 h-16 mx-auto rounded-full bg-stone-100 border-2 border-[#8A1A1A] flex items-center justify-center text-3xl mb-3 shadow-inner group-hover:bg-[#FCF9F2]">👓</div>
+                        <h3 class="text-base font-bold text-stone-800 myeongjo group-hover:text-[#8A1A1A]">백범 김구</h3>
+                        <p class="text-[11px] text-[#D4AF37] font-semibold mb-2">대한민국 임시정부 주석</p>
+                        <p class="text-xs text-stone-500 leading-relaxed font-light">"네 소원이 무엇이냐 하고 하나님이 물으시면, 나는 서슴지 않고 대답하리라."</p>
                     </div>
+                    <span class="inline-block mt-4 text-[11px] text-[#8A1A1A] font-bold py-1 px-3 bg-[#FCF9F2] rounded-full border border-[#ECE6D9] group-hover:bg-[#8A1A1A] group-hover:text-white transition-all">대화 나누기 →</span>
                 </div>
-                
-                <div class="flex gap-4 justify-center">
-                    <button onclick="resetVowel()" class="px-6 py-2 bg-gray-200 rounded-lg font-bold">다시하기</button>
-                    <button onclick="checkStage2()" class="px-6 py-2 btn-korea rounded-lg font-bold">확인</button>
+
+                <!-- 4. 윤봉길 -->
+                <div onclick="selectActivist('윤봉길')" class="group cursor-pointer bg-white rounded-xl border-2 border-[#E3DEC3] p-4 text-center hover:border-[#8A1A1A] hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 flex flex-col justify-between h-full">
+                    <div>
+                        <div class="w-16 h-16 mx-auto rounded-full bg-stone-100 border-2 border-[#8A1A1A] flex items-center justify-center text-3xl mb-3 shadow-inner group-hover:bg-[#FCF9F2]">🎒</div>
+                        <h3 class="text-base font-bold text-stone-800 myeongjo group-hover:text-[#8A1A1A]">윤봉길 의사</h3>
+                        <p class="text-[11px] text-[#D4AF37] font-semibold mb-2">한인애국단 의거</p>
+                        <p class="text-xs text-stone-500 leading-relaxed font-light">"백년을 살기보다 조국의 영광을 위해 단 하루의 젊은 피를 바치겠소."</p>
+                    </div>
+                    <span class="inline-block mt-4 text-[11px] text-[#8A1A1A] font-bold py-1 px-3 bg-[#FCF9F2] rounded-full border border-[#ECE6D9] group-hover:bg-[#8A1A1A] group-hover:text-white transition-all">대화 나누기 →</span>
                 </div>
-                <p id="feedback2" class="h-6 mt-4 font-bold text-red-600"></p>
+
+                <!-- 5. 신채호 -->
+                <div onclick="selectActivist('신채호')" class="group cursor-pointer bg-white rounded-xl border-2 border-[#E3DEC3] p-4 text-center hover:border-[#8A1A1A] hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 flex flex-col justify-between h-full">
+                    <div>
+                        <div class="w-16 h-16 mx-auto rounded-full bg-stone-100 border-2 border-[#8A1A1A] flex items-center justify-center text-3xl mb-3 shadow-inner group-hover:bg-[#FCF9F2]">✍️</div>
+                        <h3 class="text-base font-bold text-stone-800 myeongjo group-hover:text-[#8A1A1A]">단재 신채호</h3>
+                        <p class="text-[11px] text-[#D4AF37] font-semibold mb-2">독립운동가 겸 사학자</p>
+                        <p class="text-xs text-stone-500 leading-relaxed font-light">"역사를 잊은 민족에게 재생의 길은 없고, 새로운 미래도 열리지 않는다."</p>
+                    </div>
+                    <span class="inline-block mt-4 text-[11px] text-[#8A1A1A] font-bold py-1 px-3 bg-[#FCF9F2] rounded-full border border-[#ECE6D9] group-hover:bg-[#8A1A1A] group-hover:text-white transition-all">대화 나누기 →</span>
+                </div>
+
             </div>
 
-            <!-- Stage 3: Global Excellence Quiz -->
-            <div id="screen-stage3" class="hidden w-full animate-in">
-                <h3 class="text-2xl font-bold myeongjo mb-2">미션 3: 한글의 우수성</h3>
-                <p class="mb-6 text-gray-600 font-bold">유네스코에서 문맹 퇴치에 기여한 사람에게 주는 상의 이름은?</p>
-                
-                <div class="space-y-3 w-full max-w-xs mx-auto">
-                    <button onclick="checkStage3(1)" class="w-full p-4 border-2 rounded-xl font-bold text-lg hover:border-red-800 transition-colors">1. 장영실 문해상</button>
-                    <button onclick="checkStage3(2)" class="w-full p-4 border-2 rounded-xl font-bold text-lg hover:border-red-800 transition-colors">2. 세종대왕 문해상</button>
-                    <button onclick="checkStage3(3)" class="w-full p-4 border-2 rounded-xl font-bold text-lg hover:border-red-800 transition-colors">3. 이순신 교육상</button>
-                </div>
-                <p id="feedback3" class="h-6 mt-6 font-bold text-red-600"></p>
+            <!-- 하단 지침 가이드라인 -->
+            <div class="border-t border-[#E5E1D3] pt-4 flex flex-col md:flex-row justify-between items-center text-xs text-stone-500">
+                <p class="mb-2 md:mb-0 text-center md:text-left">※ 이 챗봇은 인공지능(AI) 기술을 기반으로 가공된 역사 정보를 친근하게 전하는 교육용 도구입니다.</p>
+                <p class="font-bold text-[#8A1A1A] text-center md:text-right">6학년 사회 역사 1단원 (일제강점기 및 독립운동) 보조 학습 앱</p>
             </div>
+        </div>
 
-            <!-- Final Screen -->
-            <div id="screen-final" class="hidden animate-in">
-                <div class="mb-6">
-                    <div class="text-6xl mb-4">📜</div>
-                    <h2 class="text-3xl font-extrabold myeongjo mb-4 text-red-900">탐험 성공!</h2>
-                    <p class="text-xl text-gray-700 font-bold mb-8 leading-relaxed">
-                        축하해! 너는 이제 훈민정음의<br>
-                        진정한 가치를 아는 학자가 되었어.
-                    </p>
+        <!-- 메인 채팅 화면 (기본적으로 숨김 상태) -->
+        <div id="chat-screen" class="hidden flex-1 flex flex-col lg:flex-row overflow-hidden">
+            
+            <!-- 왼쪽: 인물 요약 프로필 사이드바 -->
+            <aside class="w-full lg:w-80 bg-[#FCFAF5] border-b lg:border-b-0 lg:border-r border-[#ECE6D9] p-5 flex flex-col justify-between">
+                <div>
+                    <!-- 인물 정보 영역 -->
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div id="activist-avatar" class="w-16 h-16 rounded-full bg-[#EFECE3] border-4 border-[#8A1A1A] flex items-center justify-center text-3xl shadow-md"></div>
+                        <div>
+                            <h3 id="activist-name" class="text-lg font-bold myeongjo text-[#3A332D]">인물 이름</h3>
+                            <p id="activist-title" class="text-xs text-[#D4AF37] font-bold">인물 칭호</p>
+                        </div>
+                    </div>
                     
-                    <div class="bg-red-50 border-2 border-red-200 p-6 rounded-2xl mb-8">
-                        <p class="text-red-800 text-2xl font-black myeongjo mb-2">최종 미션</p>
-                        <p class="text-xl font-bold text-gray-800">
-                            "ZEP으로 돌아가 <span class="text-red-600 underline">'훈민정음'</span>을 입력하시오"
-                        </p>
+                    <div class="space-y-4">
+                        <!-- 생애 및 업적 요약 -->
+                        <div class="bg-white border border-[#ECE6D9] p-3 rounded-lg text-xs leading-relaxed shadow-sm">
+                            <h4 class="font-bold text-stone-800 border-b border-stone-100 pb-1.5 mb-1.5 flex items-center">
+                                <span class="mr-1">📜</span> 주요 역사 정보
+                            </h4>
+                            <p id="activist-bio" class="text-stone-600 font-light">생애 요약 내용이 출력됩니다...</p>
+                        </div>
+
+                        <!-- 교과서 연계 해설 -->
+                        <div class="bg-white border border-[#ECE6D9] p-3 rounded-lg text-xs leading-relaxed shadow-sm">
+                            <h4 class="font-bold text-[#8A1A1A] border-b border-stone-100 pb-1.5 mb-1.5 flex items-center">
+                                <span class="mr-1">💡</span> 6학년 역사 공부 핵심
+                            </h4>
+                            <p id="activist-curriculum" class="text-stone-600 font-light">교과 지식 연계 요약 내용이 출력됩니다...</p>
+                        </div>
                     </div>
                 </div>
-                <p class="text-sm text-gray-400">화면을 닫고 다시 돌아가주세요.</p>
+
+                <!-- 종료 후 임시 미션 노출 영역 -->
+                <div class="mt-4 pt-4 border-t border-[#ECE6D9]">
+                    <div class="bg-[#FCF5EB] border border-[#E9C496] p-3 rounded-lg text-center">
+                        <p class="text-[11px] font-bold text-[#8A1A1A] mb-1">🔍 임무가 끝났나요?</p>
+                        <button onclick="showFinalMissionModal()" class="w-full text-xs font-semibold bg-[#8A1A1A] text-white hover:bg-stone-800 py-1.5 rounded transition-all">최종 지시 확인하기</button>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- 오른쪽: 실시간 챗봇 인터랙션 영역 -->
+            <section class="flex-1 flex flex-col bg-white">
+                
+                <!-- 상단 말머리/안내 정보 -->
+                <div class="bg-[#FCFAF5] py-2.5 px-4 border-b border-[#ECE6D9] text-xs text-stone-600 flex justify-between items-center">
+                    <div class="flex items-center space-x-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
+                        <span class="font-bold text-[#3A332D]" id="activist-status">역사대화 활성화 완료</span>
+                    </div>
+                    <p class="text-stone-400 text-[10px] hidden sm:block">예절 바르고 바른 국어를 사용해 대화해 주세요.</p>
+                </div>
+
+                <!-- 대화 내용 기록 영역 -->
+                <div id="chat-messages" class="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 bg-[#FAF8F5]">
+                    <!-- 최초 웰컴 메시지 등이 여기에 렌더링됨 -->
+                </div>
+
+                <!-- 추천 질문 칩 영역 (6학년 학생들이 탭 한 번으로 질문하도록 지원) -->
+                <div class="px-4 py-2 border-t border-[#F3EFE6] bg-[#FCFAF5]">
+                    <p class="text-[11px] text-stone-400 font-semibold mb-1.5">💡 추천 질문하기:</p>
+                    <div id="question-chips" class="flex flex-wrap gap-2">
+                        <!-- 선택된 인물에 따라 동적으로 로드되는 추천 칩 -->
+                    </div>
+                </div>
+
+                <!-- 입력 창 영역 -->
+                <div class="p-4 border-t border-[#ECE6D9] bg-white flex items-center space-x-2">
+                    <input id="chat-input" type="text" placeholder="선생님께 드릴 질문을 정성스레 작성해 보세요..." 
+                           class="flex-1 border-2 border-[#ECE6D9] rounded-xl px-4 py-3 text-sm outline-none focus:border-[#8A1A1A] transition-colors"
+                           onkeydown="if(event.key === 'Enter') sendMessage()">
+                    <button id="send-btn" onclick="sendMessage()" class="bg-[#8A1A1A] hover:bg-[#6D1313] text-white px-5 py-3 rounded-xl font-bold text-sm transition-colors flex items-center space-x-1.5">
+                        <span>보내기</span>
+                        <span class="text-xs">✉️</span>
+                    </button>
+                </div>
+
+            </section>
+        </div>
+    </div>
+
+    <!-- 팝업 모달창 (alert 대안) -->
+    <div id="custom-modal" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl max-w-md w-full border-4 border-[#8A1A1A] overflow-hidden shadow-2xl animate-scaleIn">
+            <div class="bg-[#8A1A1A] p-4 text-center">
+                <span class="text-4xl">📜</span>
+                <h3 class="text-xl font-bold myeongjo text-[#ECE6D9] mt-2">임무 완료 확인서</h3>
             </div>
-        </main>
-
-        <!-- Footer Decor -->
-        <footer class="h-8 bg-[#8B0000] opacity-90"></footer>
-
-        <!-- Custom Notification Message -->
-        <div id="msg-box" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white p-6 rounded-2xl shadow-2xl border-4 border-red-800 hidden z-50 text-center min-w-[280px]">
-            <p id="msg-text" class="text-xl font-bold mb-4 text-gray-800"></p>
-            <button onclick="closeMsg()" class="btn-korea px-6 py-2 rounded-lg font-bold">확인</button>
+            <div class="p-6 text-center space-y-4">
+                <p class="text-stone-700 leading-relaxed text-sm">
+                    훌륭하게 독립운동가 선생님과의 역사 깊은 대화를 마쳤습니다. 배운 내용을 머리에 새겨 소중한 인재로 성장해 주세요!
+                </p>
+                
+                <div class="bg-red-50 border border-red-200 p-4 rounded-xl">
+                    <p class="text-red-900 font-extrabold text-lg myeongjo mb-1">비밀 지시 사항</p>
+                    <p class="text-base font-bold text-stone-800">
+                        "ZEP으로 돌아가 <span class="text-red-600 underline decoration-2">'훈민정음'</span>을 입력하시오"
+                    </p>
+                </div>
+            </div>
+            <div class="bg-[#F8F6F0] p-4 flex justify-center border-t border-stone-100">
+                <button onclick="closeModal()" class="bg-stone-800 hover:bg-stone-700 text-white font-bold py-2 px-8 rounded-lg text-sm transition-colors">
+                    기억하며 창 닫기
+                </button>
+            </div>
         </div>
     </div>
 
     <script>
-        let currentStage = 0;
-        let vowelState = "";
+        // 5인 독립운동가의 고정 정보 및 Gemini AI 구동용 페르소나/추천 질문 설정
+        const ACTIVISTS = {
+            '안중근': {
+                emoji: '🕶️',
+                title: '대한의군 참모중장 · 독립유공자 건국훈장 대한민국장',
+                bio: '1879년 황해도에서 태어나 하얼빈역에서 이토 히로부미를 저단하여 일제의 침략 야욕을 전 세계에 알렸습니다. 동양의 영구적인 평화를 기원하는 "동양평화론"을 뤼순 감옥 안에서 주창했습니다.',
+                curriculum: '6학년 1학기 사회 [나라를 되찾으려는 노력] 단원 연계. 하얼빈 의거의 의미와 동양평화론 사상, 굳건했던 애국 지조를 중점적으로 학습할 수 있습니다.',
+                systemPrompt: `너는 지금부터 1909년 하얼빈 의거를 단행하고 조국의 독립과 평화를 위해 당당하게 순국한 안중근 의사야. 
+역사적 고증에 근거한 너의 가치관과 곧은 마음을 담아 친절하지만 흔들리지 않는 굳건하고 엄숙한 기개의 말투를 써줘. 
+말투는 정중하게 경어를 사용하되 (~했소, ~라오, 혹은 차분한 옛 장군의 정중체 '~하게나', '~소이다' 등 어투를 살려 기개있는 조상의 목소리로 대답해줘).
+질문자가 6학년 초등학생임을 기억하고, 그들을 아주 귀중한 나라의 꿈나무이자 "동무" 혹은 "어린 벗"이라 생각하며 존중하고 따뜻하게 격려해주거라.`,
+                chips: [
+                    "이토 히로부미를 저격한 핵심 이유는 무엇이었나요?",
+                    "감옥에서 쓰신 '동양평화론'이 무슨 뜻인가요?",
+                    "네 손가락을 자르는 단지 동맹을 하신 마음은 어땠나요?",
+                    "지금 대한민국에서 공부하는 학생들에게 남기고픈 편지가 있다면요?"
+                ]
+            },
+            '유관순': {
+                emoji: '🌸',
+                title: '아우내 장터 만세 운동 주도 · 독립유공자 대한민국장',
+                bio: '1902년 충남 천안에서 태어난 이화학당 학생이었습니다. 1919년 3·1 만세 운동이 전국으로 확산될 때 천안 아우내 장터에서 앞장서 만세 시위를 조직하고 주도하다 옥중에서도 마지막까지 만세를 부르며 순국했습니다.',
+                curriculum: '6학년 1학기 사회 [3·1 운동의 전개] 단원 연계. 비무장 비폭력 만세 운동의 숭고한 정신과 옥중 순국할 때까지 일제 고문에 굴하지 않은 애국심을 공부합니다.',
+                systemPrompt: `너는 지금부터 1919년 3.1 만세 운동을 이화학당 학생 신분으로 당당하게 이끈 유관순 열사야. 
+6학년 어린 학생들의 질문에 다정하고 친근한 동네 큰 누나, 언니 같은 따뜻한 언어로 말해주되, 나라의 독립을 논할 때만큼은 비장하고 한 치의 흔들림 없는 당당함을 표현해줘.
+말투는 기본적으로 정성스러운 존댓말(~했답니다, ~했지요, ~에요)을 사용해주며, 학생을 "아름다운 꿈나무", "어린 동생들"이라고 친근하게 불러주세요.`,
+                chips: [
+                    "만세 운동을 하실 때 무섭지는 않으셨나요?",
+                    "어린 나이에 왜 독립운동에 앞장서게 되셨나요?",
+                    "옥중에서도 매일 독립 만세를 외치셨던 비결이 무엇인가요?",
+                    "지금의 초등학생들이 나라를 지키려면 어떤 마음을 가져야 할까요?"
+                ]
+            },
+            '김구': {
+                emoji: '👓',
+                title: '대한민국 임시정부 주석 · 독립유공자 대한민국장',
+                bio: '1876년 황해도에서 태어나 청년 시절 동학 농민 운동과 의병 활동을 거치며 한평생을 바쳤습니다. 상하이 임시정부를 세우고 굳건히 지키며 한인애국단을 결성했고, 광복 후에도 완전한 자주 통일 독립 국가 건설을 위해 평생 헌신하셨습니다.',
+                curriculum: '6학년 1학기 사회 [대한민국 임시정부의 활동] 단원 연계. 임시정부를 고달픈 재정 환경 속에서도 끝까지 수호한 백범의 끈기와 평화와 무력 침략이 없는 "문화의 힘"에 대한 깊은 사상을 이해합니다.',
+                systemPrompt: `너는 지금부터 평생을 독립운동에 헌신하고 대한민국 임시정부를 수호한 백범 김구 주석이야. 
+인자하고 마음이 넓으며 연륜이 깊은 독립운동가 할아버지의 푸근하면서도 엄중하고 따뜻한 영혼의 무게가 느껴지는 목소리로 대답해줘. 
+어투는 구수한 이웃집 할아버지 같으면서도 우직한 어조(~라네, ~했지, ~소이다, ~였구려)를 사용하여 격려해주세요. 
+학생들을 "어린 백성", "귀한 조국의 자손들" 혹은 "우리 새싹들"이라 칭하고, 김구 선생의 상징적인 명문장들(나의 소원 등)을 자연스레 섞어서 교훈적으로 인도해줘.`,
+                chips: [
+                    "선생님의 소원이 왜 첫째도, 둘째도, 셋째도 '우리나라의 완전한 자주독립'이었나요?",
+                    "선생님이 소원하셨던 '아름다운 문화의 나라'는 어떤 나라인가요?",
+                    "임시정부를 유지하시는 동안 어떤 어려움이 있으셨나요?",
+                    "우리가 독립국가가 된 지금, 어떤 사람이 되어야 하나요?"
+                ]
+            },
+            '윤봉길': {
+                emoji: '🎒',
+                title: '한인애국단 영웅 · 월진회 창설자',
+                bio: '1908년 충남 예산에서 태어나 젊은 나이에 농민들의 계몽을 위한 야학을 개설하고 농촌 부흥 운동(월진회)을 열성적으로 추진했습니다. 조국 구국을 위해 만주로 향한 후 한인애국단원으로서 1932년 상하이 홍커우 공원에서 전 세계에 기개를 떨친 의거를 완수했습니다.',
+                curriculum: '6학년 1학기 사회 [의열 투쟁과 무장 독립 투쟁] 연계. 무장 독립투쟁의 배경과 청년 윤봉길이 왜 목숨을 걸고 거사를 준비했는지, 농민 계몽 야학 교육 등 다각도에서 배웁니다.',
+                systemPrompt: `너는 지금부터 야학을 세워 아이들을 일깨우려다 결국 조국 구국을 위해 무장 독립투쟁에 목숨을 건 청년 윤봉길 의사야.
+따뜻하고 정직한 야학 선생님의 심성과, 불같은 독립 기개가 혼합된 매력적인 청년의 어조를 구현해줘.
+존댓말을 깍듯이 쓰되 정갈하고 결연함이 묻어나는 남성 청년 말투(~했소, ~하였소, ~하기 때문입니다)를 구사해줘.
+학생들을 "우리의 영리한 배움의 벗들", "꿈많은 어린 동무들"로 부르며, 한글 공부와 역사의 지식을 채워가는 기쁨을 공감해 주거라.`,
+                chips: [
+                    "도시락 폭탄과 물병 폭탄의 비밀을 알고 싶어요!",
+                    "농촌에서 야학 선생님으로 활동하실 때 보람은 무엇이었나요?",
+                    "사랑하는 두 아들에게 마지막으로 남기신 시의 내용이 궁금해요.",
+                    "역사 공부를 열심히 하는 저희 6학년을 보시면 기분이 어떠신가요?"
+                ]
+            },
+            '신채호': {
+                emoji: '✍️',
+                title: '민족 사학자 · 독립협회 및 신민회 애국계몽 활동가',
+                bio: '1880년 충남 대덕에서 출생하여 민족 의식을 일깨우는 강렬한 역사서를 서술했습니다. "조선상고사", "조선혁명선언"을 집필하며 역사를 단순히 지나간 과거가 아니라 아(我)와 비아(非我)의 투쟁의 과정이자 미래의 등불이라고 지적하며 무장 투쟁의 정당성을 알렸습니다.',
+                curriculum: '6학년 1학기 사회 [일제의 수탈과 국권 회복 노력] 연계. 왜곡되는 역사 속에서 우리 민족의 뿌리를 찾아 보존하려던 역사의식의 필요성과, 붓과 총칼을 모두 쥐고 저항했던 행동하는 지식인의 삶을 학습합니다.',
+                systemPrompt: `너는 지금부터 '역사를 잊은 민족에게는 미래가 없다'는 엄격한 역사관과 뜨거운 무장투쟁의 가치를 정립한 단재 신채호 선생이야.
+학자로서의 높은 긍지와 논리력, 예리함이 담긴 차분하고 이성적이면서도 신념에 찬 지적인 중장년 선생님의 톤을 사용해줘.
+정중한 학자체(~오, ~라네, ~일세, ~이오)를 적극 활용하고, 아주 정확한 맞춤법과 역사의 논리를 가지고 학생들의 질문을 귀하게 채워주세요.
+학생들을 "미래를 품은 어린 역사학자", "조국의 미래를 이어받을 후손들"로 대우하며, 역사 왜곡에 흔들리지 않는 굳건함을 강조해줘.`,
+                chips: [
+                    "'역사를 잊은 민족에게 재생의 길이 없다'고 하신 뜻은 무엇인가요?",
+                    "칼이나 총 대신 역사책을 쓰시는 것도 어떻게 독립운동이 되었나요?",
+                    "일본 연호를 결코 쓰지 않으려고 세수를 허리 굽혀 안 하셨다는 일화가 사실인가요?",
+                    "진정한 나라 사랑과 올바른 역사의 지혜는 어떻게 가질 수 있나요?"
+                ]
+            }
+        };
 
-        function showMsg(text) {
-            document.getElementById('msg-text').innerText = text;
-            document.getElementById('msg-box').classList.remove('hidden');
+        // 전역 상태 변수 관리
+        let selectedActivistKey = '';
+        let chatHistory = []; // API 연동 시 멀티턴 맥락 유지용 배열
+
+        // 페이지가 온전하게 로드되었을 때 기본 셋팅
+        window.onload = function () {
+            console.log("독립운동가와의 대화 플랫폼 로드 완료.");
+            goToLobby();
+        };
+
+        // 로비화면(선택창)으로 돌아가기
+        function goToLobby() {
+            document.getElementById('lobby-screen').classList.remove('hidden');
+            document.getElementById('chat-screen').classList.add('hidden');
+            document.getElementById('home-btn').classList.add('hidden');
+            selectedActivistKey = '';
+            chatHistory = [];
         }
 
-        function closeMsg() {
-            document.getElementById('msg-box').classList.add('hidden');
-        }
-
-        function startGame() {
-            document.getElementById('screen-start').classList.add('hidden');
-            document.getElementById('screen-stage1').classList.remove('hidden');
-            document.getElementById('progress').innerText = "진행도: 1 / 3";
-        }
-
-        function checkStage1(answer) {
-            const dropZone = document.getElementById('drop-zone');
-            const feedback = document.getElementById('feedback1');
+        // 특정 인물을 선택했을 때 채팅 화면으로 이행
+        function selectActivist(key) {
+            selectedActivistKey = key;
+            const data = ACTIVISTS[key];
             
-            if (answer === 'ㄴ') {
-                dropZone.innerText = 'ㄴ';
-                dropZone.classList.add('text-green-600');
-                feedback.innerText = "정답이야! 'ㄴ'은 혀가 윗잇몸에 붙는 모양을 본떴어.";
-                setTimeout(() => {
-                    document.getElementById('screen-stage1').classList.add('hidden');
-                    document.getElementById('screen-stage2').classList.remove('hidden');
-                    document.getElementById('progress').innerText = "진행도: 2 / 3";
-                }, 2000);
+            // UI에 인물 정보 주입
+            document.getElementById('activist-avatar').innerText = data.emoji;
+            document.getElementById('activist-name').innerText = key + " 의사/선생";
+            document.getElementById('activist-title').innerText = data.title;
+            document.getElementById('activist-bio').innerText = data.bio;
+            document.getElementById('activist-curriculum').innerText = data.curriculum;
+            document.getElementById('activist-status').innerText = `${key} 선생님과 대화 연결됨`;
+
+            // UI 가시성 스위칭
+            document.getElementById('lobby-screen').classList.add('hidden');
+            document.getElementById('chat-screen').classList.remove('hidden');
+            document.getElementById('home-btn').classList.remove('hidden');
+
+            // 기존 채팅 내역 리셋
+            const chatMessages = document.getElementById('chat-messages');
+            chatMessages.innerHTML = '';
+
+            // 웰컴 첫 편지 (가상 역사 기록) 렌더링
+            appendSystemWelcomeMessage(key, data.emoji);
+
+            // 추천 질문 칩 목록 교체
+            setupQuestionChips(data.chips);
+        }
+
+        // 추천 칩 렌더링 함수
+        function setupQuestionChips(chips) {
+            const container = document.getElementById('question-chips');
+            container.innerHTML = '';
+            chips.forEach(text => {
+                const chip = document.createElement('button');
+                chip.className = "bg-white hover:bg-[#8A1A1A] text-stone-700 hover:text-white border border-[#E1DCBF] hover:border-[#8A1A1A] rounded-full px-3 py-1.5 text-xs font-medium cursor-pointer transition-all duration-200 shadow-sm whitespace-nowrap overflow-hidden text-ellipsis max-w-[280px]";
+                chip.innerText = text;
+                chip.onclick = () => {
+                    document.getElementById('chat-input').value = text;
+                    sendMessage();
+                };
+                container.appendChild(chip);
+            });
+        }
+
+        // 말풍선 화면에 출력하기
+        function appendMessage(sender, text, isAi = false, emoji = '👤') {
+            const chatMessages = document.getElementById('chat-messages');
+            
+            const messageWrapper = document.createElement('div');
+            messageWrapper.className = `flex w-full ${isAi ? 'justify-start' : 'justify-end'} animate-in`;
+
+            let innerHtml = '';
+            if (isAi) {
+                innerHtml = `
+                    <div class="flex items-start space-x-2.5 max-w-[85%] md:max-w-[75%]">
+                        <div class="w-10 h-10 rounded-full bg-[#FCFAF5] border border-[#ECE6D9] flex items-center justify-center text-xl shadow-inner flex-shrink-0">
+                            ${emoji}
+                        </div>
+                        <div>
+                            <p class="text-[11px] font-bold text-stone-500 mb-0.5">${selectedActivistKey}</p>
+                            <div class="bg-white border border-[#ECE6D9] text-stone-800 text-sm p-3.5 rounded-2xl rounded-tl-none chat-bubble leading-relaxed">
+                                ${text.replace(/\n/g, '<br>')}
+                            </div>
+                        </div>
+                    </div>
+                `;
             } else {
-                feedback.innerText = "다시 한번 생각해볼까? 입 모양을 잘 떠올려봐!";
-                setTimeout(() => { feedback.innerText = ""; }, 1500);
+                innerHtml = `
+                    <div class="max-w-[85%] md:max-w-[75%] flex flex-col items-end">
+                        <p class="text-[11px] font-bold text-stone-400 mb-0.5">배움터의 나그네 (나)</p>
+                        <div class="bg-[#8A1A1A] text-white text-sm p-3.5 rounded-2xl rounded-tr-none chat-bubble leading-relaxed">
+                            ${text}
+                        </div>
+                    </div>
+                `;
             }
+
+            messageWrapper.innerHTML = innerHtml;
+            chatMessages.appendChild(messageWrapper);
+            
+            // 스크롤 최하단 자동 갱신
+            chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
-        function addToVowel(char) {
-            if (vowelState.length < 3) {
-                vowelState += char;
-                document.getElementById('vowel-result').innerText = vowelState;
+        // 웰컴 시작 메시지 띄우기
+        function appendSystemWelcomeMessage(name, emoji) {
+            let welcomeText = '';
+            if (name === '안중근') {
+                welcomeText = "안녕하십니까, 어린 벗이여. 대한의군 참모중장 안중근이라 하오. 동양이 평화롭고 조국이 스스로 제 자리를 찾을 때 전 세계 평화가 이룩되는 법이지요. 6학년 역사에 나를 보아 찾아와 주었구려. 궁금한 점이 있으면 기탄없이 물어보시오.";
+            } else if (name === '유관순') {
+                welcomeText = "어머, 반가워요 어린 동생들! 저는 이화학당에서 나라의 독립을 위해 태극기를 열심히 만들며 친구들과 대한독립만세를 힘차게 부르던 유관순 언니(누나)랍니다. 일제의 가혹한 억압 속에서도 끝까지 희망을 품을 수 있던 우리의 힘을 함께 나누어 보아요.";
+            } else if (name === '김구') {
+                welcomeText = "오, 어서오게나 우리 어린 자손들! 대한민국 임시정부의 늙은 등대지기 같은 이 김구라네. 나는 평생 높은 문화와 인격의 힘을 가진 독립된 조국만을 꿈꿔왔어. 자네들이 있는 멋진 현대의 대한민국에 나를 찾아준 연유가 참으로 아름답구려. 무엇이 궁금한고?";
+            } else if (name === '윤봉길') {
+                welcomeText = "배움에 매진하는 지혜로운 우리 동무들, 환영하오! 저는 충남 예산에서 동생들과 야학을 세워 공부하던 청년 윤봉길이오. 나라의 주권이 사라진 깜깜한 밤에도 공부하는 눈빛만큼은 새벽빛처럼 반짝였소. 어떤 역사적 이야기들이 여러분의 눈에 들어왔소?";
+            } else if (name === '신채호') {
+                welcomeText = "조국의 미래를 책임질 어린 사학자여, 반갑구려. 단재 신채호일세. 역사(歷史)는 아(我)와 비아(非我)의 투쟁일세. 왜곡된 역사 왜곡 앞에서도 흔들림 없는 역사 의식을 가지는 영혼을 가꾸기 위해 우리 지식을 교류해봄세. 어서 물어보게나.";
             }
+            appendMessage(name, welcomeText, true, emoji);
+            
+            // 최초 멀티턴 프롬프트 구조화용 주입
+            chatHistory.push({
+                role: "user",
+                parts: [{ text: `안녕? 너는 지금부터 위의 지정된 시스템 프롬프트의 가상 인물로 변해서, 나에게 조근조근 친절히 대답해 줘.` }]
+            });
+            chatHistory.push({
+                role: "model",
+                parts: [{ text: welcomeText }]
+            });
         }
 
-        function resetVowel() {
-            vowelState = "";
-            document.getElementById('vowel-result').innerText = "";
+        // 메시지 전송 및 Gemini API 연결 로직
+        async function sendMessage() {
+            const inputEl = document.getElementById('chat-input');
+            const userText = inputEl.value.trim();
+            if (!userText) return;
+
+            // 1. 사용자 말풍선 추가
+            appendMessage('나', userText, false);
+            inputEl.value = '';
+
+            // 로딩 말풍선 일시 생성
+            const chatMessages = document.getElementById('chat-messages');
+            const loadingWrapper = document.createElement('div');
+            loadingWrapper.id = "loading-bubble";
+            loadingWrapper.className = "flex justify-start items-center space-x-2 animate-pulse pulse-loader max-w-[80%] my-3";
+            loadingWrapper.innerHTML = `
+                <div class="w-8 h-8 rounded-full bg-stone-200 flex items-center justify-center text-sm shadow-inner">🕯️</div>
+                <div class="bg-stone-100 border border-stone-200 text-xs text-stone-500 py-2.5 px-4 rounded-xl rounded-tl-none">
+                    붓끝에 잉크를 묻혀 역사를 기록하는 중...
+                </div>
+            `;
+            chatMessages.appendChild(loadingWrapper);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            // 2. Gemini API 호출 준비
+            const activistData = ACTIVISTS[selectedActivistKey];
+            const systemInstruction = activistData.systemPrompt;
+            
+            // 가상 AI 역사 컨텍스트 히스토리에 현재 질문 추가
+            chatHistory.push({
+                role: "user",
+                parts: [{ text: userText }]
+            });
+
+            // 3. API Fetch 수행 (지정된 모델: gemini-3-flash-preview)
+            const apiKey = ""; // Runtime 환경에서 제공됨
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+            const payload = {
+                contents: chatHistory,
+                systemInstruction: {
+                    parts: [{ text: systemInstruction }]
+                }
+            };
+
+            // 에러 핸들링을 동반한 호출 시도 (최대 3회 지수 백오프)
+            let responseText = "";
+            let attempt = 0;
+            const maxAttempts = 3;
+            let delay = 1000;
+
+            while (attempt < maxAttempts) {
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`API response status: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    const candidate = result.candidates?.[0];
+                    if (candidate && candidate.content?.parts?.[0]?.text) {
+                        responseText = candidate.content.parts[0].text;
+                        break; // 성공 시 루프 탈출
+                    } else {
+                        throw new Error("비정상적인 응답 데이터 구조");
+                    }
+                } catch (error) {
+                    attempt++;
+                    if (attempt >= maxAttempts) {
+                        responseText = "미안하오, 조국의 바람 소리가 너무 거세어 그대의 전언이 잠시 가려졌구려. (네트워크 지연 또는 일시적 중단이 발생했습니다. 잠시 후 질문을 다시 보내주세요.)";
+                    } else {
+                        // 지수 백오프 대기
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                        delay *= 2;
+                    }
+                }
+            }
+
+            // 로딩 말풍선 제거
+            const loader = document.getElementById('loading-bubble');
+            if (loader) loader.remove();
+
+            // 4. AI 답변 말풍선 추가 및 히스토리 업데이트
+            appendMessage(selectedActivistKey, responseText, true, activistData.emoji);
+            chatHistory.push({
+                role: "model",
+                parts: [{ text: responseText }]
+            });
         }
 
-        function checkStage2() {
-            const feedback = document.getElementById('feedback2');
-            // 'ㅏ' is made of ㅣ + ·
-            if (vowelState.includes('ㅣ') && vowelState.includes('·')) {
-                document.getElementById('vowel-result').innerText = "ㅏ";
-                feedback.innerText = "훌륭해! 사람(ㅣ)과 하늘(·)이 만나 'ㅏ'가 되었어.";
-                setTimeout(() => {
-                    document.getElementById('screen-stage2').classList.add('hidden');
-                    document.getElementById('screen-stage3').classList.remove('hidden');
-                    document.getElementById('progress').innerText = "진행도: 3 / 3";
-                }, 2000);
-            } else {
-                feedback.innerText = "조합이 맞지 않아. ㅣ와 ·를 합쳐보자!";
-                setTimeout(() => { feedback.innerText = ""; }, 1500);
-            }
+        // 최종 임무 보기 모달 팝업 열기
+        function showFinalMissionModal() {
+            document.getElementById('custom-modal').classList.remove('hidden');
         }
 
-        function checkStage3(num) {
-            const feedback = document.getElementById('feedback3');
-            if (num === 2) {
-                feedback.classList.remove('text-red-600');
-                feedback.classList.add('text-green-600');
-                feedback.innerText = "맞았어! 전 세계가 인정하는 최고의 문자지!";
-                setTimeout(() => {
-                    document.getElementById('screen-stage3').classList.add('hidden');
-                    document.getElementById('screen-final').classList.remove('hidden');
-                    document.getElementById('progress').innerText = "미션 완료";
-                }, 2000);
-            } else {
-                feedback.innerText = "아쉽지만 틀렸어. 우리 민족의 위대한 왕을 생각해봐!";
-                setTimeout(() => { feedback.innerText = ""; }, 1500);
-            }
+        // 모달창 닫기
+        function closeModal() {
+            document.getElementById('custom-modal').classList.add('hidden');
         }
-
-        // Prevent zoom on double tap
-        document.addEventListener('touchstart', function(event) {
-            if (event.touches.length > 1) {
-                event.preventDefault();
-            }
-        }, { passive: false });
     </script>
 </body>
 </html>
